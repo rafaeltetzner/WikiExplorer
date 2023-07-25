@@ -22,7 +22,7 @@ class WikiScraper():
             self.logger.error(f'Error fetching wiki page: {e}')
             return None
     
-    def parse(self, html, base_url):
+    def parse(self, html, url):
         if not html:
             self.logger.warning(f'Null HTML provided to parser')
             return None
@@ -31,7 +31,7 @@ class WikiScraper():
         h1 = soup.select_one('h1')
         title = None
         if not h1:
-            self.logger.error(f'Error parsing title from html with base {base_url}, probably no title')
+            self.logger.error(f'Error parsing title from html with url {url}, probably no title')
         else:
             title = h1.text.strip()
 
@@ -39,7 +39,7 @@ class WikiScraper():
         for link in soup.find_all('a'):
             href = link.get('href')
             if href and href.startswith('/wiki/'):
-                full_link = urljoin(base_url, href)
+                full_link = urljoin(url, href)
                 links.add(full_link)
 
         self.logger.info(f'Parsed {len(links)} links from the page')
