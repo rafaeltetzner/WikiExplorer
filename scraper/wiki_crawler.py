@@ -14,7 +14,6 @@ class URLManager:
         children_as_ids = [self.get_id(child) for child in children]
         self.id_children[self.get_id(url)] = children_as_ids
 
-import time
 class WikiCrawler:
     def __init__(self):
         self.scraper = WikiScraper()
@@ -36,7 +35,6 @@ class WikiCrawler:
             self.queue.put(new)
 
     def run(self, start_url):
-        self.start = time.time()
         self.acc = 0
         self.queue.put(start_url)
         while not self.queue.empty():
