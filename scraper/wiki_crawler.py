@@ -35,7 +35,6 @@ class WikiCrawler:
             self.queue.put(new)
 
     def run(self, start_url):
-        self.acc = 0
         self.queue.put(start_url)
         while not self.queue.empty():
             url = self.queue.get()
