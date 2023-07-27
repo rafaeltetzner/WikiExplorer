@@ -31,12 +31,11 @@ class WikiScraper():
             return None
         
         links = set()
-        for link in soup.find_all('a'):
+        for link in content_div.find_all('a'):
             href = link.get('href')
             if href:
                 href = unquote(link.get('href'))
                 if href.startswith('/wiki/') and not any(symbol in href for symbol in ['#', '?', '@', '&', '.']):
-                    full_link = urljoin(url, href)
-                    links.add(full_link)
+                    links.add(href)
 
         return {"links": links}

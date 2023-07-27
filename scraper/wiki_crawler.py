@@ -1,5 +1,6 @@
 from scraper.wiki_scraper import WikiScraper
 from collections import defaultdict
+from urllib.parse import urljoin
 from urllib.parse import urlparse
 from urllib.parse import quote
 from queue import Queue
@@ -40,15 +41,16 @@ class URLManager:
                 row = id_bytes + url_bytes + b'\x00'
                 f.write(row)
         self.lastsave = len(self.id_children)
-        
+
 class WikiCrawler:
     def __init__(self):
         self.scraper = WikiScraper()
         self.url_manager = URLManager()
         self.queue = Queue()
+        self.starting_url = ""
     
     def crawl(self, url):
-        html = self.scraper.fetch(url)
+        html = self.scraper.fetch(urljoin(self.starting_url, url))
         data = self.scraper.parse(html, url)
         return data["links"] if data else []
     
@@ -63,6 +65,7 @@ class WikiCrawler:
         self.url_manager.set_children(url, children)
 
     def run(self, start_url, filenames, save_every=10, check=10):
+        self.starting_url = start_url
         processed_count = 0
         last_discovered_count = 0
         last_time = time.time()
@@ -70,7 +73,7 @@ class WikiCrawler:
         max_children_father = None
 
         childrenfile, idfile = filenames
-        self.queue.put(start_url)
+        self.queue.put(urlparse(start_url).path)
         while not self.queue.empty():
             url = self.queue.get()
             self.process_url(url)
@@ -97,4 +100,3 @@ class WikiCrawler:
                       f"| Process Rate: {process_rate:.2f}/s | Discover Rate: {discover_rate:.2f}/s "
                       f"| Len: {max_children_len} | Father: {max_children_father}")
         self.url_manager.save(childrenfile, idfile)
-            
